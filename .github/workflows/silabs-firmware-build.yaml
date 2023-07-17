@@ -60,6 +60,9 @@ jobs:
         shell: su --shell=/bin/bash builder {0}
     steps:
       - uses: actions/checkout@v3.3.0
+      - name: Change workdir
+        shell: bash
+        run: cd /__w/silabs-firmware-builder/silabs-firmware-builder
       - name: Adjust permission
         shell: bash
         run: chown builder .
