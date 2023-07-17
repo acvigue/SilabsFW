@@ -135,4 +135,4 @@ jobs:
         if: success() || failure()
         with:
           name: ${{ inputs.firmware_name }}
-          path: /__w/silabs-firmware-builder/silabs-firmware-builder/${{ inputs.firmware_name }}
+          path: /__w/silabs-firmware-builder/silabs-firmware-builder/build/release/${{ inputs.project_name }}.gbl
