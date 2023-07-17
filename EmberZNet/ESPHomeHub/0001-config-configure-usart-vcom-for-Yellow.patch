@@ -12,7 +12,6 @@ diff --git a/config/sl_iostream_usart_vcom_config.h b/config/sl_iostream_usart_v
 index 330844c..0d013fb 100644
 --- a/config/sl_iostream_usart_vcom_config.h
 +++ b/config/sl_iostream_usart_vcom_config.h
-@@ -84,21 +84,24 @@
 @@ -61,7 +61,7 @@
  // <usartHwFlowControlCtsAndRts=> CTS/RTS
  // <uartFlowControlSoftware=> Software Flow control (XON/XOFF)
