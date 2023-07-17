@@ -62,6 +62,10 @@ jobs:
             device: MGM210PA32JIA
             components: simple_led:board_activity,zigbee_token_interface
             patchpath: "EmberZNet/Yellow"
+          - target: homehub
+            device: MGM210PA32JIA
+            components: zigbee_token_interface
+            patchpath: "EmberZNet/ESPHomeHub"
           - target: skyconnect
             device: EFR32MG21A020F512IM32
             components: zigbee_token_interface
