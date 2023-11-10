@@ -1,4 +1,4 @@
-FROM debian:bullseye
+FROM debian:bookworm
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -12,7 +12,7 @@ RUN \
        jq \
        libgl1 \
        make \
-       openjdk-17-jre-headless \
+       default-jre-headless \
        patch \
        python3 \
        unzip
@@ -46,11 +46,12 @@ RUN \
 
 ENV PATH="$PATH:/opt/gcc-arm-none-eabi-${GCC_ARM_VERSION}/bin"
 
-ARG GECKO_SDK_VERSION="v4.3.1"
+ARG GECKO_SDK_VERSION="v4.3.2"
 
 RUN \
     git clone --depth 1 -b ${GECKO_SDK_VERSION} \
-       https://github.com/SiliconLabs/gecko_sdk.git
+       https://github.com/SiliconLabs/gecko_sdk.git \
+    && rm -rf gecko_sdk/.git
 
 ARG USERNAME=builder
 ARG USER_UID=1000

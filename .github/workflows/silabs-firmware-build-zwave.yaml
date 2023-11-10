@@ -16,9 +16,6 @@ on:
       project_name:
         required: true
         type: string
-      baudrate:
-        required: true
-        type: number
       device:
         required: true
         type: string
@@ -47,7 +44,16 @@ on:
         required: false
         default: "null"
         type: string
-
+      gbl_compression:
+        required: true
+        type: string
+      gbl_sign_key:
+        required: false
+        type: string
+      gbl_enc_key:
+        required: false
+        type: string
+      
 jobs:
   firmware-build:
     name: Build firmware
@@ -60,9 +66,6 @@ jobs:
         shell: su --shell=/bin/bash builder {0}
     steps:
       - uses: actions/checkout@v3.3.0
-      - name: Change workdir
-        shell: bash
-        run: cd /__w/silabs-firmware-builder/silabs-firmware-builder
       - name: Adjust permission
         shell: bash
         run: chown builder .
@@ -71,20 +74,15 @@ jobs:
           slc generate \
               --with="${{ inputs.device }},${{ inputs.components }}" \
               --project-file="${{ inputs.project_file }}" \
+              --output-type="makefile" \
               --export-destination="$PWD/${{ inputs.firmware_name }}" \
               --copy-proj-sources --copy-sdk-sources --new-project --force \
               --configuration="${{ inputs.configuration }}"
 
-      - name: Set Baudrate
-        run: |
-          cd /__w/silabs-firmware-builder/silabs-firmware-builder/${{ inputs.firmware_name }}
-          sed -Ei "s/^(\s*#define SL_\S+_VCOM_BAUDRATE\s+)[0-9]+/\\1${{ inputs.baudrate }}/" \
-              config/sl_*usart_vcom_config.h
-
       - name: Patch Firmware
         if: "${{ inputs.patchpath != '' }}"
         run: |
-          cd /__w/silabs-firmware-builder/silabs-firmware-builder/${{ inputs.firmware_name }}
+          cd ${{ inputs.firmware_name }}
           for patch in "../${{ inputs.patchpath }}"/*.patch
           do
               echo "Applying ${patch}"
@@ -94,7 +92,7 @@ jobs:
       - name: Patch SDK
         if: "${{ inputs.sdkpatchpath != '' }}"
         run: |
-          cd /__w/silabs-firmware-builder/silabs-firmware-builder/${{ inputs.firmware_name }}/gecko_sdk_${{ inputs.sdk_version }}
+          cd ${{ inputs.firmware_name }}/gecko_sdk_${{ inputs.sdk_version }}
           for patch in "../../${{ inputs.sdkpatchpath }}"/*.patch
           do
               echo "Applying ${patch}"
@@ -104,35 +102,43 @@ jobs:
       - name: Patch Makefile
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          LC_TIME=C meta_datetime=$(git log -1 --format="%cd" --date=format:"%b %-d %Y %H:%M:%S")
-          cd /__w/silabs-firmware-builder/silabs-firmware-builder/${{ inputs.firmware_name }}
-          sed -i "s/^C_DEFS\s*=.*$/C_DEFS = '-DOPENTHREAD_BUILD_DATETIME=\"$meta_datetime\"' ${{ inputs.extra_c_defs }}/" \
+          cd ${{ inputs.firmware_name }}
+          echo "POST_BUILD_EXE = $PWD/${{ inputs.firmware_name }}/postbuild.sh"
+          sed -i "s/^C_DEFS\s*=.*$/C_DEFS = ${{ inputs.extra_c_defs }}/" \
+            "${{ inputs.project_name }}.Makefile"
+          sed -i 's#^POST_BUILD_EXE_LINUX = .*$#POST_BUILD_EXE_LINUX = true#' \
             "${{ inputs.project_name }}.Makefile"
 
       - name: Build Firmware
         run: |
-          cd /__w/silabs-firmware-builder/silabs-firmware-builder/${{ inputs.firmware_name }}
+          cd ${{ inputs.firmware_name }}
           make -f ${{ inputs.project_name }}.Makefile release
       - name: Add Firmware Metadata
         run: |
-          cd /__w/silabs-firmware-builder/silabs-firmware-builder/${{ inputs.firmware_name }}
+          cd ${{ inputs.firmware_name }}
           jq --null-input \
              '{
                 "metadata_version": 1,
                 "sdk_version": "${{ inputs.sdk_version }}",
-                "fw_type": "${{ inputs.metadata_fw_type }}",
-                "baudrate": ${{ inputs.baudrate }}
+                "fw_type": "${{ inputs.metadata_fw_type }}"
               } + ${{ inputs.metadata_extra }}' >  version.json
 
       - name: Generate gbl Firmware
         run: |
-          cd /__w/silabs-firmware-builder/silabs-firmware-builder/${{ inputs.firmware_name }}
-          commander gbl create build/release/${{ inputs.project_name }}.gbl \
-                    --app build/release/${{ inputs.project_name }}.out \
-                    --device ${{ inputs.device }} --metadata version.json
+          cd ${{ inputs.firmware_name }}
+          if [ -n "${{ inputs.gbl_sign_key }}" ] ; then
+            SIGN_KEY="--sign ${{ inputs.gbl_sign_key }}"
+          fi
+          if [ -n "${{ inputs.gbl_enc_key }}" ] ; then
+            ENC_KEY="--encrypt ${{ inputs.gbl_enc_key }}"
+          fi
+          commander gbl create build/release/${{ inputs.firmware_name }}.gbl \
+                    --app build/release/${{ inputs.project_name }}.hex \
+                    $SIGN_KEY $ENC_KEY \
+                    --compress ${{ inputs.gbl_compression }}
 
       - uses: actions/upload-artifact@v3
         if: success() || failure()
         with:
-          name: ${{ inputs.firmware_name }}.gbl
-          path: /__w/silabs-firmware-builder/silabs-firmware-builder/${{ inputs.firmware_name }}/build/release/${{ inputs.project_name }}.gbl
+          name: ${{ inputs.firmware_name }}
+          path: ${{ inputs.firmware_name }}/build/release/${{ inputs.firmware_name }}.gbl
