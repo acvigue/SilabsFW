@@ -211,6 +211,22 @@ jobs:
             enc_key: /gecko_sdk/protocol/z-wave/platform/SiliconLabs/PAL/BootLoader/controller-keys/controller_encrypt.key
             patchpath: ""
 
+          - target: esphomehub
+            device: ZGM230SB27HGN
+            components: brd4205b
+            compression: lzma
+            sign_key: /gecko_sdk/protocol/z-wave/platform/SiliconLabs/PAL/BootLoader/controller-keys/controller_sign.key
+            enc_key: /gecko_sdk/protocol/z-wave/platform/SiliconLabs/PAL/BootLoader/controller-keys/controller_encrypt.key
+            patchpath: "ZWave/ESPHomeHub"
+
+          - target: nuchub
+            device: ZGM230SB27HGN
+            components: brd4205b
+            compression: lzma
+            sign_key: /gecko_sdk/protocol/z-wave/platform/SiliconLabs/PAL/BootLoader/controller-keys/controller_sign.key
+            enc_key: /gecko_sdk/protocol/z-wave/platform/SiliconLabs/PAL/BootLoader/controller-keys/controller_encrypt.key
+            patchpath: "ZWave/NUCHub"
+
     uses: ./.github/workflows/silabs-firmware-build-zwave.yaml
     with:
       project_file: "/gecko_sdk/protocol/z-wave/Apps/zwave_ncp_serial_api/zwave_ncp_serial_api_controller.slcp"
