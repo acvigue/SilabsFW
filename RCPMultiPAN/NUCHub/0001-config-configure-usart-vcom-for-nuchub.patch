@@ -7,7 +7,7 @@ index 265c262..270fe4a 100644
  // <usartHwFlowControlCtsAndRts=> CTS/RTS
  // <i> Default: usartHwFlowControlCtsAndRts
 -#define SL_CPC_DRV_UART_VCOM_FLOW_CONTROL_TYPE usartHwFlowControlCtsAndRts
-+#define SL_CPC_DRV_UART_VCOM_FLOW_CONTROL_TYPE usartHwFlowControlSoftware
++#define SL_CPC_DRV_UART_VCOM_FLOW_CONTROL_TYPE usartHwFlowControlNone
  // </h>
  
  // <<< end of configuration section >>>
