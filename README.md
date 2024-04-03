@@ -68,8 +68,7 @@ commits or add new commits ontop, and regenerate the patches:
 git init .
 git add .
 git commit -m "initial commit"
-git am ../EmberZNet/SkyConnect/*.patch 
+git am ../EmberZNet/SkyConnect/*.patch
 <make change>
 git format-patch -N --output-directory=../EmberZNet/SkyConnect/ HEAD~2
 ```
-

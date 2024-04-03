@@ -1,0 +1,32 @@
+diff --git a/config/zw_config_rf.h b/config/zw_config_rf.h
+index 67df812..c6fdeb8 100644
+--- a/config/zw_config_rf.h
++++ b/config/zw_config_rf.h
+@@ -22,12 +22,12 @@
+ // <o APP_MAX_TX_POWER_LR> The maximum allowed Tx power in deci dBm for Z-Wave Long Range network <140..200:1> <f.d>
+ // <i> The maximum allowed Tx power in deci dBm for Z-Wave Long Range network
+ // <i> Default: 140
+-#define APP_MAX_TX_POWER_LR  140
++#define APP_MAX_TX_POWER_LR  200
+ 
+ // <o APP_MAX_TX_POWER> The maximum allowed Tx power in deci dBm for Z-Wave network <-100..140:1> <f.d>
+ // <i> The maximum allowed Tx power in deci dBm for Z-Wave network
+ // <i> Default: 0
+-#define APP_MAX_TX_POWER  0
++#define APP_MAX_TX_POWER  100
+ 
+ // <o APP_MEASURED_0DBM_TX_POWER> The deci dBmoutput measured at a PA setting of 0dBm <-50..50:1> <f.d>
+ // <i> The deci dBm output measured at a PA setting of 0dBm
+diff --git a/config/zw_region_config.h b/config/zw_region_config.h
+index a8ee344..1eb54bd 100644
+--- a/config/zw_region_config.h
++++ b/config/zw_region_config.h
+@@ -34,7 +34,7 @@
+ // <REGION_US=> United States
+ // <REGION_US_LR=> United States Long Range
+ // <i> Default: REGION_DEFAULT
+-#define ZW_REGION  REGION_DEFAULT
++#define ZW_REGION  REGION_US_LR
+ 
+ // </h>
+ 
